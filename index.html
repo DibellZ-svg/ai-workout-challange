@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Workout Challenge — Squat & Push-Up</title>
+  <title>AI Workout Duel — Squat & Push-Up Multiplayer</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Library PeerJS untuk koneksi Room Multiplayer antar perangkat -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
   <div class="app-container">
     <!-- Panel Kontrol Atas -->
     <header class="topbar">
       <div class="brand">
-        <h1>AI Workout Challenge</h1>
-        <p>Penghitung Repetisi Squat & Push-Up Berbasis Pose Estimation</p>
+        <h1>AI Workout Duel</h1>
+        <p>Tantangan Squat & Push-Up Real-Time (Solo & Multiplayer Room)</p>
       </div>
 
       <div class="controls">
         <div class="control-group">
-          <label for="input-nama">Nama Peserta</label>
-          <input type="text" id="input-nama" placeholder="Contoh: Budi" maxlength="24" />
+          <label for="input-nama">Nama Kamu</label>
+          <input type="text" id="input-nama" placeholder="Contoh: Budi" maxlength="18" />
         </div>
 
         <div class="control-group">
@@ -46,72 +48,108 @@
             <option value="kanan">Kanan</option>
           </select>
         </div>
+      </div>
 
-        <button id="btn-mulai" class="btn primary" disabled>Memuat Model AI...</button>
-        <button id="btn-reset" class="btn secondary">Reset</button>
+      <!-- Panel Room Multiplayer -->
+      <div class="room-panel">
+        <div class="room-actions" id="room-setup">
+          <button id="btn-solo" class="btn primary" disabled>Memuat AI...</button>
+          <button id="btn-buat-room" class="btn info" disabled>Buat Room</button>
+          <div class="join-box">
+            <input type="text" id="input-kode-room" placeholder="Kode Room" maxlength="6" />
+            <button id="btn-gabung-room" class="btn secondary" disabled>Gabung</button>
+          </div>
+        </div>
+
+        <div class="room-active hidden" id="room-info">
+          <span class="badge" id="badge-room">ROOM: -----</span>
+          <span class="room-peer-status" id="status-koneksi">Menunggu lawan...</span>
+          <button id="btn-mulai-duel" class="btn primary hidden">Mulai Duel (7s)</button>
+          <button id="btn-keluar-room" class="btn danger-outline">Keluar Room</button>
+        </div>
       </div>
     </header>
 
-    <!-- Area Utama Kamera & HUD -->
-    <main class="stage-wrapper">
-      <div class="hud-top">
-        <div class="hud-card">
-          <span class="hud-label" id="hud-gerakan-label">SQUAT</span>
-          <span class="hud-value accent" id="hud-skor">0</span>
-        </div>
-        <div class="hud-card">
-          <span class="hud-label">SISA WAKTU</span>
-          <span class="hud-value" id="hud-waktu">30 dtk</span>
-        </div>
-        <div class="hud-card small">
-          <span class="hud-label">SISI AKTIF</span>
-          <span class="hud-subvalue" id="hud-sisi">-</span>
-          <span class="hud-fps" id="hud-fps">0 FPS</span>
-        </div>
-      </div>
-
-      <!-- Video Kamera & Canvas Overlay -->
-      <div class="video-box">
-        <video id="webcam" autoplay playsinline muted></video>
-        <canvas id="output-canvas"></canvas>
-
-        <!-- Kotak Karakter Panduan (Pojok Kanan Bawah) -->
-        <div class="guide-box">
-          <div class="guide-title" id="guide-title">Contoh SQUAT</div>
-          <canvas id="guide-canvas" width="160" height="115"></canvas>
+    <!-- Area Utama: Papan Skor Perbandingan + Kamera Tegak Lurus -->
+    <main class="main-layout">
+      <!-- Papan Perbandingan Real-Time -->
+      <aside class="scoreboard-panel">
+        <div class="score-card me">
+          <div class="player-tag">KAMU</div>
+          <div class="player-name" id="label-nama-kamu">Pemain 1</div>
+          <div class="player-score" id="hud-skor-kamu">0</div>
+          <div class="player-motion" id="hud-gerakan-label">SQUAT</div>
         </div>
 
-        <!-- Overlay Hitung Mundur 7 Detik -->
-        <div id="overlay-persiapan" class="overlay hidden">
-          <div class="overlay-card">
-            <div class="overlay-title">BERSIAP POSISI!</div>
-            <div class="overlay-countdown" id="countdown-angka">7</div>
-            <div class="overlay-desc" id="countdown-instruksi">
-              Berdiri menyamping 1,5 - 2 meter dari kamera agar seluruh kaki terlihat
+        <div class="timer-card">
+          <div class="timer-label">SISA WAKTU</div>
+          <div class="timer-value" id="hud-waktu">30</div>
+          <div class="timer-unit">DETIK</div>
+          <div class="meta-info">
+            <span id="hud-sisi">Sisi: -</span> • <span id="hud-fps">0 FPS</span>
+          </div>
+          <button id="btn-reset" class="btn secondary full-width">Reset</button>
+        </div>
+
+        <div class="score-card opponent" id="card-lawan">
+          <div class="player-tag">LAWAN ROOM</div>
+          <div class="player-name" id="label-nama-lawan">Belum Terhubung</div>
+          <div class="player-score" id="hud-skor-lawan">-</div>
+          <div class="player-diff" id="hud-selisih">Mode Solo</div>
+        </div>
+      </aside>
+
+      <!-- Kamera Dominan Tegak Lurus (Potret) -->
+      <section class="portrait-stage">
+        <div class="video-box">
+          <video id="webcam" autoplay playsinline muted></video>
+          <canvas id="output-canvas"></canvas>
+
+          <!-- Karakter Panduan Pojok Kanan Bawah -->
+          <div class="guide-box">
+            <div class="guide-title" id="guide-title">Contoh SQUAT</div>
+            <canvas id="guide-canvas" width="135" height="100"></canvas>
+          </div>
+
+          <!-- Overlay Hitung Mundur 7 Detik -->
+          <div id="overlay-persiapan" class="overlay hidden">
+            <div class="overlay-card">
+              <div class="overlay-title">BERSIAP POSISI!</div>
+              <div class="overlay-countdown" id="countdown-angka">7</div>
+              <div class="overlay-desc" id="countdown-instruksi">
+                Berdiri menyamping 1,5 - 2 meter agar seluruh tubuh terlihat dari kepala hingga kaki
+              </div>
+            </div>
+          </div>
+
+          <!-- Overlay Hasil Akhir & Perbandingan -->
+          <div id="overlay-selesai" class="overlay hidden">
+            <div class="overlay-card result">
+              <div class="overlay-title" id="hasil-judul">WAKTU HABIS!</div>
+              <div class="duel-summary" id="hasil-perbandingan">
+                <div class="duel-col">
+                  <span id="akhir-nama-kamu">Kamu</span>
+                  <strong id="akhir-skor-kamu">0</strong>
+                </div>
+                <div class="duel-vs" id="akhir-vs">VS</div>
+                <div class="duel-col" id="kolom-akhir-lawan">
+                  <span id="akhir-nama-lawan">Lawan</span>
+                  <strong id="akhir-skor-lawan">0</strong>
+                </div>
+              </div>
+              <div class="result-detail" id="hasil-detail">Squat dalam 30 detik</div>
+              <button id="btn-main-lagi" class="btn primary">Main Lagi</button>
             </div>
           </div>
         </div>
 
-        <!-- Overlay Hasil Akhir -->
-        <div id="overlay-selesai" class="overlay hidden">
-          <div class="overlay-card result">
-            <div class="overlay-title">WAKTU HABIS!</div>
-            <div class="result-name" id="hasil-nama">Peserta</div>
-            <div class="result-score" id="hasil-skor">0</div>
-            <div class="result-detail" id="hasil-detail">Squat dalam 30 detik</div>
-            <button id="btn-main-lagi" class="btn primary">Main Lagi</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Banner Status Bawah -->
-      <footer class="status-bar" id="status-bar">
-        Menyiapkan kamera dan model AI MediaPipe... Pastikan izin kamera diaktifkan.
-      </footer>
+        <footer class="status-bar" id="status-bar">
+          Menyiapkan kamera tegak lurus dan model AI...
+        </footer>
+      </section>
     </main>
   </div>
 
-  <!-- Memuat MediaPipe Tasks Vision via ES Module -->
   <script type="module" src="script.js"></script>
 </body>
 </html>

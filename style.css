@@ -11,12 +11,12 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 16px;
+  padding: 14px;
 }
 
 .app-container {
   width: 100%;
-  max-width: 1040px;
+  max-width: 1020px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -28,27 +28,23 @@ body {
   border-radius: 12px;
   padding: 14px 18px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .brand h1 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   color: #38bdf8;
 }
 
 .brand p {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #94a3b8;
-  margin-top: 2px;
 }
 
 .controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
   gap: 10px;
 }
 
@@ -56,10 +52,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
+  min-width: 120px;
 }
 
 .control-group label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -71,26 +69,64 @@ input, select {
   color: #f8fafc;
   padding: 8px 10px;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   outline: none;
+  width: 100%;
 }
 
 input:focus, select:focus {
   border-color: #38bdf8;
 }
 
-.btn {
-  padding: 9px 16px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.1s;
+.room-panel {
+  border-top: 1px solid #334155;
+  padding-top: 10px;
 }
 
-.btn:active {
-  transform: scale(0.98);
+.room-actions, .room-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.join-box {
+  display: flex;
+  gap: 6px;
+}
+
+.join-box input {
+  width: 120px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.badge {
+  background: #0f172a;
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  font-size: 0.95rem;
+}
+
+.room-peer-status {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  flex: 1;
+}
+
+.btn {
+  padding: 9px 15px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .btn:disabled {
@@ -103,80 +139,145 @@ input:focus, select:focus {
   color: #06281e;
 }
 
+.btn.info {
+  background: #38bdf8;
+  color: #082f49;
+}
+
 .btn.secondary {
   background: #334155;
   color: #f8fafc;
 }
 
-.stage-wrapper {
-  position: relative;
+.btn.danger-outline {
+  background: transparent;
+  border: 1px solid #f87171;
+  color: #f87171;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Tata Letak Utama: Papan Skor di Kiri + Kamera Tegak Lurus di Tengah/Kanan */
+.main-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.scoreboard-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.score-card, .timer-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+
+.score-card.me {
+  border-color: #10b981;
+}
+
+.score-card.opponent {
+  border-color: #f59e0b;
+}
+
+.player-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #94a3b8;
+}
+
+.player-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 2px;
+  color: #f8fafc;
+}
+
+.player-score {
+  font-size: 3.4rem;
+  font-weight: 900;
+  line-height: 1.05;
+  margin: 6px 0;
+}
+
+.score-card.me .player-score {
+  color: #34d399;
+}
+
+.score-card.opponent .player-score {
+  color: #fbbf24;
+}
+
+.player-motion, .player-diff {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.timer-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.timer-value {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  margin: 4px 0;
+}
+
+.timer-value.danger {
+  color: #f87171;
+}
+
+.timer-unit {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+}
+
+.meta-info {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+/* Kamera Dominan Tegak Lurus (Potret Tinggi) */
+.portrait-stage {
   background: #1e293b;
   border: 1px solid #334155;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-.hud-top {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(15, 23, 42, 0.92);
-  border-bottom: 1px solid #334155;
-}
-
-.hud-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.hud-card.small {
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.hud-label {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  font-weight: 600;
-  letter-spacing: 0.8px;
-}
-
-.hud-value {
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.hud-value.accent {
-  color: #34d399;
-}
-
-.hud-value.danger {
-  color: #f87171;
-}
-
-.hud-subvalue {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #38bdf8;
-}
-
-.hud-fps {
-  font-size: 0.78rem;
-  color: #64748b;
+  align-items: center;
 }
 
 .video-box {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  max-width: 440px;       /* Membatasi lebar agar tegak lurus memanjang */
+  aspect-ratio: 3 / 4;    /* Rasio potret vertikal dominan */
+  min-height: 540px;
   background: #020617;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0 auto;
 }
 
 video, #output-canvas {
@@ -184,33 +285,32 @@ video, #output-canvas {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1); /* Efek cermin alami */
+  object-fit: cover;      /* Mengisi area potret secara penuh tanpa gepeng */
+  transform: scaleX(-1);
 }
 
 .guide-box {
   position: absolute;
-  right: 14px;
-  bottom: 14px;
+  right: 10px;
+  bottom: 10px;
   background: rgba(15, 23, 42, 0.85);
   border: 1px solid #475569;
   border-radius: 10px;
-  padding: 6px 8px;
+  padding: 5px 6px;
   z-index: 5;
   text-align: center;
 }
 
 .guide-title {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: #38bdf8;
-  margin-bottom: 2px;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(2, 6, 23, 0.75);
+  background: rgba(2, 6, 23, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,18 +318,18 @@ video, #output-canvas {
   padding: 16px;
 }
 
-.overlay.hidden {
-  display: none;
+.hidden {
+  display: none !important;
 }
 
 .overlay-card {
   background: #1e293b;
   border: 2px solid #38bdf8;
   border-radius: 16px;
-  padding: 24px 32px;
+  padding: 22px 24px;
   text-align: center;
-  max-width: 420px;
   width: 100%;
+  max-width: 340px;
 }
 
 .overlay-card.result {
@@ -237,53 +337,67 @@ video, #output-canvas {
 }
 
 .overlay-title {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #38bdf8;
-  letter-spacing: 1px;
-}
-
-.overlay-card.result .overlay-title {
-  color: #34d399;
 }
 
 .overlay-countdown {
-  font-size: 5rem;
+  font-size: 4.8rem;
   font-weight: 900;
   color: #34d399;
   line-height: 1.1;
-  margin: 10px 0;
+  margin: 8px 0;
 }
 
 .overlay-desc {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   color: #cbd5e1;
 }
 
-.result-name {
-  font-size: 1.1rem;
-  color: #e2e8f0;
-  margin-top: 8px;
+.duel-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 14px 0;
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 10px;
 }
 
-.result-score {
-  font-size: 4.5rem;
-  font-weight: 900;
+.duel-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.duel-col span {
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.duel-col strong {
+  font-size: 2.4rem;
   color: #34d399;
-  line-height: 1.1;
-  margin: 6px 0;
+}
+
+.duel-vs {
+  font-weight: 900;
+  color: #f59e0b;
 }
 
 .result-detail {
-  font-size: 0.95rem;
-  color: #94a3b8;
-  margin-bottom: 18px;
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  margin-bottom: 14px;
 }
 
 .status-bar {
-  padding: 10px 16px;
+  width: 100%;
+  padding: 10px 14px;
   background: #0f172a;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   color: #e2e8f0;
   border-top: 1px solid #334155;
+  text-align: center;
 }
