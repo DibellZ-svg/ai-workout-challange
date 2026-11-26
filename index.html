@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Workout Challenge — Squat & Push-Up</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Panel Kontrol Atas -->
+    <header class="topbar">
+      <div class="brand">
+        <h1>AI Workout Challenge</h1>
+        <p>Penghitung Repetisi Squat & Push-Up Berbasis Pose Estimation</p>
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label for="input-nama">Nama Peserta</label>
+          <input type="text" id="input-nama" placeholder="Contoh: Budi" maxlength="24" />
+        </div>
+
+        <div class="control-group">
+          <label for="select-gerakan">Gerakan</label>
+          <select id="select-gerakan">
+            <option value="squat">Squat</option>
+            <option value="pushup">Push-Up</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="select-durasi">Durasi</label>
+          <select id="select-durasi">
+            <option value="15">15 Detik</option>
+            <option value="30" selected>30 Detik</option>
+            <option value="60">60 Detik</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="select-sisi">Sisi Pantau</label>
+          <select id="select-sisi">
+            <option value="otomatis" selected>Otomatis</option>
+            <option value="kiri">Kiri</option>
+            <option value="kanan">Kanan</option>
+          </select>
+        </div>
+
+        <button id="btn-mulai" class="btn primary" disabled>Memuat Model AI...</button>
+        <button id="btn-reset" class="btn secondary">Reset</button>
+      </div>
+    </header>
+
+    <!-- Area Utama Kamera & HUD -->
+    <main class="stage-wrapper">
+      <div class="hud-top">
+        <div class="hud-card">
+          <span class="hud-label" id="hud-gerakan-label">SQUAT</span>
+          <span class="hud-value accent" id="hud-skor">0</span>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">SISA WAKTU</span>
+          <span class="hud-value" id="hud-waktu">30 dtk</span>
+        </div>
+        <div class="hud-card small">
+          <span class="hud-label">SISI AKTIF</span>
+          <span class="hud-subvalue" id="hud-sisi">-</span>
+          <span class="hud-fps" id="hud-fps">0 FPS</span>
+        </div>
+      </div>
+
+      <!-- Video Kamera & Canvas Overlay -->
+      <div class="video-box">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="output-canvas"></canvas>
+
+        <!-- Kotak Karakter Panduan (Pojok Kanan Bawah) -->
+        <div class="guide-box">
+          <div class="guide-title" id="guide-title">Contoh SQUAT</div>
+          <canvas id="guide-canvas" width="160" height="115"></canvas>
+        </div>
+
+        <!-- Overlay Hitung Mundur 7 Detik -->
+        <div id="overlay-persiapan" class="overlay hidden">
+          <div class="overlay-card">
+            <div class="overlay-title">BERSIAP POSISI!</div>
+            <div class="overlay-countdown" id="countdown-angka">7</div>
+            <div class="overlay-desc" id="countdown-instruksi">
+              Berdiri menyamping 1,5 - 2 meter dari kamera agar seluruh kaki terlihat
+            </div>
+          </div>
+        </div>
+
+        <!-- Overlay Hasil Akhir -->
+        <div id="overlay-selesai" class="overlay hidden">
+          <div class="overlay-card result">
+            <div class="overlay-title">WAKTU HABIS!</div>
+            <div class="result-name" id="hasil-nama">Peserta</div>
+            <div class="result-score" id="hasil-skor">0</div>
+            <div class="result-detail" id="hasil-detail">Squat dalam 30 detik</div>
+            <button id="btn-main-lagi" class="btn primary">Main Lagi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner Status Bawah -->
+      <footer class="status-bar" id="status-bar">
+        Menyiapkan kamera dan model AI MediaPipe... Pastikan izin kamera diaktifkan.
+      </footer>
+    </main>
+  </div>
+
+  <!-- Memuat MediaPipe Tasks Vision via ES Module -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
